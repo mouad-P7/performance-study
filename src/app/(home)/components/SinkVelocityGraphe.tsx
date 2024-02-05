@@ -12,19 +12,19 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function PR_PA_Graphe({
+export default function SinkVelocityGraphe({
   powerRequiredArray,
-  powerAvailableArray,
+  maxTakeOffWeight,
 }: {
   powerRequiredArray: number[];
-  powerAvailableArray: number[];
+  maxTakeOffWeight: number;
 }) {
   let grapheData = [];
   for (let i = 0; i < data.velocityArray.length; i++) {
     grapheData.push({
       V: data.velocityArray[i],
       PR: powerRequiredArray[i],
-      PA: powerAvailableArray[i],
+      Vv: powerRequiredArray[i] / maxTakeOffWeight,
     });
   }
 
@@ -47,8 +47,7 @@ export default function PR_PA_Graphe({
         />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="PR" stroke="#5f9ed6" />
-        <Line type="monotone" dataKey="PA" stroke="#f09252" />
+        <Line type="monotone" dataKey="Vv" stroke="#5f9ed6" />
       </LineChart>
     </ResponsiveContainer>
   );

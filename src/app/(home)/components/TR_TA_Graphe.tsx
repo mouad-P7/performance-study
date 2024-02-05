@@ -15,9 +15,11 @@ import {
 export default function TR_TA_Graphe({
   thrustRequiredArray,
   thrustAvailable,
+  thrustAvailableAt1000ft,
 }: {
   thrustRequiredArray: number[];
   thrustAvailable: number;
+  thrustAvailableAt1000ft: number;
 }) {
   let grapheData = [];
   for (let i = 0; i < data.velocityArray.length; i++) {
@@ -25,6 +27,7 @@ export default function TR_TA_Graphe({
       V: data.velocityArray[i],
       TR: thrustRequiredArray[i],
       TA: thrustAvailable,
+      TA_10000ft: thrustAvailableAt1000ft,
     });
   }
 
@@ -34,7 +37,7 @@ export default function TR_TA_Graphe({
         width={500}
         height={300}
         data={grapheData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="V" />
@@ -49,6 +52,7 @@ export default function TR_TA_Graphe({
         <Legend />
         <Line type="monotone" dataKey="TR" stroke="#5f9ed6" />
         <Line type="monotone" dataKey="TA" stroke="#f09252" />
+        <Line type="monotone" dataKey="TA_10000ft" stroke="#ff0000" />
       </LineChart>
     </ResponsiveContainer>
   );

@@ -30,7 +30,7 @@ export default function GlobalLayout({
         )}
       >
         <Header />
-        <main className="p-4 flex-1 flex flex-col">{children}</main>
+        <main className="p-4 flex-1 flex flex-col max-sm:p-2">{children}</main>
         <Footer />
         <Toaster />
       </body>

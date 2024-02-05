@@ -4,14 +4,17 @@ import { useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, FilterX } from "lucide-react";
 import { aircraftFormSchema } from "@/schema/aircraft.schema";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import PerformanceResult from "./PerformanceResult";
-import { aircraftFormFields } from "@/lib/constants";
+import SteadyPerformance from "./SteadyPerformance";
+import NonSteadyPerformance from "./NonSteadyPerformance";
 import { Separator } from "@/components/ui/separator";
+import { aircraftFormFields } from "@/lib/constants";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Form,
   FormControl,
@@ -39,7 +42,7 @@ export default function AircraftForm() {
       setIsSubmitting(true);
       setInputs(values);
       toast({
-        title: "Performance Study Calculated.",
+        title: "Performance Study Is Generated Successfully.",
         // description: <pre>{JSON.stringify(values, null, 2)}</pre>,
       });
     } catch (error) {
@@ -64,6 +67,7 @@ export default function AircraftForm() {
     form.setValue("alpha2", "");
     form.setValue("alpha0", "");
     form.setValue("thrustAvailable", "");
+    form.setValue("m", "");
     form.setValue("maxTakeOffWeight", "");
     form.setValue("maxLiftCoefficient", "");
     form.setValue("sweepAngle", "");
@@ -71,7 +75,13 @@ export default function AircraftForm() {
   }
 
   return (
-    <>
+    <div className="mb-4">
+      <Alert className="mb-2">
+        <AlertTitle>Important:</AlertTitle>
+        <AlertDescription>
+          Respect the unit described in each input.
+        </AlertDescription>
+      </Alert>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -86,7 +96,7 @@ export default function AircraftForm() {
               onClick={resetForm}
               disabled={isSubmitting}
             >
-              <Trash2 size={20} />
+              <FilterX size={20} />
               <p className="ml-2">Reset Form</p>
             </Button>
           </div>
@@ -102,7 +112,7 @@ export default function AircraftForm() {
                     <FormControl>
                       <Input
                         placeholder={item.placeholder}
-                        className="w-[235px]"
+                        className="w-[230px]"
                         {...field}
                         disabled={isSubmitting}
                       />
@@ -124,14 +134,35 @@ export default function AircraftForm() {
       </Form>
       {inputs ? (
         <>
-          <Separator className="my-4" />
-          <PerformanceResult inputs={inputs} className="mt-4" />
+          <Separator className="my-6 h-[4px] bg-primary" />
+          <Tabs defaultValue="steady-performance" className="flex flex-col">
+            <TabsList className="mb-4 w-full max-w-2xl mx-auto max-sm:px-1">
+              <TabsTrigger
+                value="steady-performance"
+                className="flex-1 max-sm:px-1"
+              >
+                Steady Performance
+              </TabsTrigger>
+              <TabsTrigger
+                value="non-steady-performance"
+                className="flex-1 max-sm:px-1"
+              >
+                Non Steady Performance
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="steady-performance">
+              <SteadyPerformance inputs={inputs} />
+            </TabsContent>
+            <TabsContent value="non-steady-performance">
+              <NonSteadyPerformance inputs={inputs} />
+            </TabsContent>
+          </Tabs>
         </>
       ) : (
-        <p className="text-center mt-8 mb-6 scroll-m-20 text-xl font-semibold tracking-tight">
+        <p className="text-center mt-8 mb-4 scroll-m-20 text-xl font-semibold tracking-tight">
           Submit the form to see results !
         </p>
       )}
-    </>
+    </div>
   );
 }

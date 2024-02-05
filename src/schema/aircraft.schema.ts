@@ -33,6 +33,9 @@ export const aircraftFormSchema = z.object({
   thrustAvailable: z.string().refine(parseNumber, {
     message: "Invalid number",
   }),
+  m: z.string().refine(parseNumber, {
+    message: "Invalid number",
+  }),
   maxTakeOffWeight: z.string().refine(parseNumber, {
     message: "Invalid number",
   }),
@@ -40,6 +43,12 @@ export const aircraftFormSchema = z.object({
     message: "Invalid number",
   }),
   sweepAngle: z.string().refine(parseNumber, {
+    message: "Invalid number",
+  }),
+  thrustSpecificFuelConsumption: z.string().refine(parseNumber, {
+    message: "Invalid number",
+  }),
+  maxUsableFuelWeight: z.string().refine(parseNumber, {
     message: "Invalid number",
   }),
 });

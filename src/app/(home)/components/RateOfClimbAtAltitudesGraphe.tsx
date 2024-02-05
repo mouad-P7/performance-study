@@ -12,32 +12,24 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function PR_PA_Graphe({
-  powerRequiredArray,
-  powerAvailableArray,
+export default function RateOfClimbAtAltitudesGraphe({
+  RateOfClimbAtAltitudesArray,
 }: {
-  powerRequiredArray: number[];
-  powerAvailableArray: number[];
+  RateOfClimbAtAltitudesArray: { h: number; maxRateOfClimb: number }[];
 }) {
-  let grapheData = [];
-  for (let i = 0; i < data.velocityArray.length; i++) {
-    grapheData.push({
-      V: data.velocityArray[i],
-      PR: powerRequiredArray[i],
-      PA: powerAvailableArray[i],
-    });
-  }
-
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
         width={500}
         height={300}
-        data={grapheData}
+        data={RateOfClimbAtAltitudesArray}
         margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="V" />
+        <XAxis
+          dataKey="maxRateOfClimb"
+          tickFormatter={(value) => value.toFixed(2)}
+        />
         <YAxis
           tickFormatter={(value) => {
             if (value >= 1e6) return (value / 1e6).toFixed(1) + "M";
@@ -47,8 +39,7 @@ export default function PR_PA_Graphe({
         />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="PR" stroke="#5f9ed6" />
-        <Line type="monotone" dataKey="PA" stroke="#f09252" />
+        <Line type="monotone" dataKey="h" stroke="#5f9ed6" />
       </LineChart>
     </ResponsiveContainer>
   );

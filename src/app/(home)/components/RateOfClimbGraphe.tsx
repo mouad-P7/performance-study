@@ -13,20 +13,15 @@ import {
 } from "recharts";
 
 export default function RateOfClimbGraphe({
-  powerRequiredArray,
-  powerAvailableArray,
-  maxTakeOffWeight,
+  RateOfClimbArray,
 }: {
-  powerRequiredArray: number[];
-  powerAvailableArray: number[];
-  maxTakeOffWeight: number;
+  RateOfClimbArray: number[];
 }) {
   let grapheData = [];
-  for (let i = 0; i < powerRequiredArray.length; i++) {
+  for (let i = 0; i < data.velocityArray.length; i++) {
     grapheData.push({
       V: data.velocityArray[i],
-      RateOfClimb:
-        (powerAvailableArray[i] - powerRequiredArray[i]) / maxTakeOffWeight,
+      RateOfClimb: RateOfClimbArray[i],
     });
   }
 
@@ -36,7 +31,7 @@ export default function RateOfClimbGraphe({
         width={500}
         height={300}
         data={grapheData}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+        margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="V" />
