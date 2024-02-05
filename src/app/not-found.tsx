@@ -3,9 +3,13 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="flex-center w-full h-screen flex-col gap-6">
-      <h2 className="h2-bold">Page Not Found</h2>
-      <p className="paragraph-semibold">404 | This page could not be found.</p>
+    <div className="flex-1 w-full h-full flex justify-center items-center flex-col gap-6">
+      <h2 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Page Not Found
+      </h2>
+      <p className="text-3xl font-semibold tracking-tight">
+        404 | This page could not be found.
+      </p>
       <Link href="/">
         <Button>Return Home</Button>
       </Link>

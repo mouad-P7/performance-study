@@ -25,14 +25,12 @@ export default function GlobalLayout({
     <html lang="en">
       <body
         className={cn(
-          "mx-auto min-h-screen w-full max-w-7xl flex flex-col bg-background font-sans antialiased",
+          "border mx-auto min-h-screen w-full max-w-7xl flex flex-col bg-background font-sans antialiased",
           fontSans.variable
         )}
       >
         <Header />
-        <main className="p-4 flex-1 flex flex-col  justify-between">
-          {children}
-        </main>
+        <main className="p-4 flex-1 flex flex-col">{children}</main>
         <Footer />
         <Toaster />
       </body>

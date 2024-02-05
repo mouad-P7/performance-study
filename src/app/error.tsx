@@ -16,9 +16,11 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex-1 flex-center flex-col gap-8">
-      <h1 className="h2-bold">Something went wrong!</h1>
-      <div className="flex-center gap-4">
+    <div className="flex-1 flex justify-center items-center flex-col gap-8">
+      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Something went wrong!
+      </h1>
+      <div className="flex justify-center items-center gap-4">
         <Link href="/">
           <Button variant="secondary">Return Home</Button>
         </Link>
