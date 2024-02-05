@@ -1,13 +1,11 @@
 import * as z from "zod";
 
-// function parseNumber(value: string) {
-//   return !isNaN(value as unknown as number);
-// }
 function parseNumber(value: string) {
   return parseFloat(value);
 }
 
 export const aircraftFormSchema = z.object({
+  // selectedAircraft: z.string().nullable(),
   wingSpan: z.string().refine(parseNumber, {
     message: "Invalid number",
   }),
