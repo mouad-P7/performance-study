@@ -1,11 +1,12 @@
-import Logo from "@/components/shared/Logo";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Logo from "./Logo";
+import DarkLightMode from "./DarkLightMode";
 
 export default async function Header() {
   return (
-    <header className="p-3 border">
+    <header className="px-4 py-2 border">
       <nav className="flex items-center justify-between flex-wrap gap-4">
         <Logo />
+        <DarkLightMode />
       </nav>
     </header>
   );

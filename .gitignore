@@ -1,6 +1,6 @@
 # files
 *.txt
-performance-study.docx
+*.docx
 
 # dependencies
 /node_modules

@@ -75,8 +75,8 @@ export default function AircraftForm() {
   }
 
   return (
-    <div className="mb-4">
-      <Alert className="p-2 mb-2">
+    <>
+      <Alert className="p-3 mb-2">
         <AlertTitle>Important:</AlertTitle>
         <AlertDescription>
           Respect the unit described in each input.
@@ -85,7 +85,7 @@ export default function AircraftForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-2"
         >
           <div className="flex justify-end gap-4">
             {/* Select Aircraft */}
@@ -123,7 +123,11 @@ export default function AircraftForm() {
               />
             ))}
           </div>
-          <Button type="submit" className="mx-auto" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="my-2 mx-auto"
+            disabled={isSubmitting}
+          >
             <Loader2
               size={20}
               className={`animate-spin ${isSubmitting ? "inline" : "hidden"}`}
@@ -159,10 +163,10 @@ export default function AircraftForm() {
           </Tabs>
         </>
       ) : (
-        <p className="text-center mt-8 mb-4 scroll-m-20 text-xl font-semibold tracking-tight">
+        <p className="text-center my-6 scroll-m-20 text-xl font-semibold">
           Submit the form to see results !
         </p>
       )}
-    </div>
+    </>
   );
 }
