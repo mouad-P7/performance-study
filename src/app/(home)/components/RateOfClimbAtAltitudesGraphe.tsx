@@ -23,7 +23,7 @@ export default function RateOfClimbAtAltitudesGraphe({
         width={500}
         height={300}
         data={RateOfClimbAtAltitudesArray}
-        margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
+        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis

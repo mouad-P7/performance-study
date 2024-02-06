@@ -34,7 +34,7 @@ export default function PR_PA_Graphe({
         width={500}
         height={300}
         data={grapheData}
-        margin={{ top: 5, right: 10, left: 5, bottom: 5 }}
+        margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="V" />

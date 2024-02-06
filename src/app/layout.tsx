@@ -25,7 +25,7 @@ export default function GlobalLayout({
     <html lang="en">
       <body
         className={cn(
-          "border mx-auto min-h-screen w-full max-w-7xl flex flex-col bg-background font-sans antialiased",
+          "overflow-x-clip border mx-auto min-h-screen w-full max-w-7xl flex flex-col bg-background font-sans antialiased",
           fontSans.variable
         )}
       >

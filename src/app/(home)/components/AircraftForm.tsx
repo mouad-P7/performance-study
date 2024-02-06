@@ -76,7 +76,7 @@ export default function AircraftForm() {
 
   return (
     <div className="mb-4">
-      <Alert className="mb-2">
+      <Alert className="p-2 mb-2">
         <AlertTitle>Important:</AlertTitle>
         <AlertDescription>
           Respect the unit described in each input.

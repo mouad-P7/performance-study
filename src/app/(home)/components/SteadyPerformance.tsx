@@ -9,6 +9,26 @@ import RateOfClimbGraphe from "./RateOfClimbGraphe";
 import SinkVelocityGraphe from "./SinkVelocityGraphe";
 import RateOfClimbAtAltitudesGraphe from "./RateOfClimbAtAltitudesGraphe";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  getLiftCoefficient,
+  getThrustRequiredArray,
+  get_TA_At1000ft,
+  get_PR_PA_Arrays,
+  getMaxVelocity,
+  get_CLdivCD_Ratios,
+  get_CLdivCD_Velocities,
+  getStallVelocity,
+  getRateOfClimbArray,
+  getZ,
+  getMaxRateOfClimb,
+  getMaxRateOfClimbVelocity,
+  getMaxClimbAngleVelocity,
+  getMinSinkVelocity,
+  getRateOfClimbAtAltitudesArray,
+  getTimeOfClimbing,
+  getMaxRange,
+  getMaxEndurance,
+} from "@/lib/performanceFunctions";
 
 export default function SteadyPerformance({
   inputs,
@@ -35,154 +55,105 @@ export default function SteadyPerformance({
     maxUsableFuelWeight,
   }: any = inputs;
 
-  // Aspect Ratio
   const aspectRatio = wingSpan ** 2 / wingArea;
 
-  // Lift Coefficient
-  const a0 =
-    ((liftCoefficient1 - liftCoefficient2) / (alpha1 - alpha2)) *
-    (180 / data.PI);
-  const A =
-    (a0 * data.PI) /
-    (180 * (1 + a0 / (data.PI * spanEfficiencyFactor * aspectRatio)));
-  const liftCoefficient = A * (alpha2 - alpha0);
+  const liftCoefficient = getLiftCoefficient(
+    liftCoefficient1,
+    liftCoefficient2,
+    alpha1,
+    alpha2,
+    alpha0,
+    aspectRatio,
+    spanEfficiencyFactor
+  );
 
-  // Thrust Required | Thrust Available
-  let thrustRequiredArray: number[] = [];
-  for (let i = 0; i < data.velocityArray.length; i++) {
-    const V = data.velocityArray[i];
-    const CL = (2 * maxTakeOffWeight) / (data.gho * V ** 2 * wingArea);
-    const CD = data.CD0 + data.k * CL ** 2;
-    const thrust = 0.5 * data.gho * V ** 2 * wingArea * CD;
-    thrustRequiredArray.push(thrust);
-  }
-  const thrustAvailableAt1000ft =
-    (thrustAvailable * data.ghoAt1000ft * m) / data.gho;
+  const thrustRequiredArray = getThrustRequiredArray(
+    wingArea,
+    maxTakeOffWeight
+  );
 
-  // Power Required | Power Available
-  let powerRequiredArray: number[] = [];
-  let powerAvailableArray: number[] = [];
-  for (let i = 0; i < data.velocityArray.length; i++) {
-    const V = data.velocityArray[i];
-    powerAvailableArray.push(thrustAvailable * V);
-    powerRequiredArray.push(thrustRequiredArray[i] * V);
-  }
+  const thrustAvailableAt1000ft = get_TA_At1000ft(thrustAvailable, m);
 
-  // Maximum Velocity Analytically
+  const { powerRequiredArray, powerAvailableArray } = get_PR_PA_Arrays(
+    thrustAvailable,
+    thrustRequiredArray
+  );
+
   const TdivW = thrustAvailable / maxTakeOffWeight;
   const WdivS = maxTakeOffWeight / wingArea;
-  const maxVelocity = Math.sqrt(
-    (TdivW * WdivS + WdivS * Math.sqrt(TdivW ** 2 - 4 * data.CD0 * data.k)) /
-      (data.gho * data.CD0)
+  const maxVelocity = getMaxVelocity(TdivW, WdivS);
+
+  const { CLdivCD_max, CL_1sur2_divCD_max, CL_3sur2_divCD_max } =
+    get_CLdivCD_Ratios();
+  const { velocity_1, velocity_1sur2, velocity_3sur2 } =
+    get_CLdivCD_Velocities(WdivS);
+
+  const stallVelocity = getStallVelocity(
+    maxLiftCoefficient,
+    sweepAngle,
+    maxTakeOffWeight,
+    wingArea
   );
 
-  // Lift To Drag Ratios
-  const CLdivCD_max = Math.sqrt(1 / (4 * data.CD0 * data.k));
-  const velocity_1 = Math.sqrt(
-    (2 / data.gho) * Math.sqrt(data.k / data.CD0) * WdivS
-  );
-  const CL_1sur2_divCD_max =
-    (3 / 4) * (1 / (2 * data.CD0 ** 3 * data.k)) ** (1 / 4);
-  const velocity_1sur2 = Math.sqrt(
-    (2 / data.gho) * Math.sqrt((3 * data.k) / data.CD0) * WdivS
-  );
-  const CL_3sur2_divCD_max =
-    (1 / 4) * (3 / (data.CD0 ** (1 / 3) * data.k)) ** (3 / 4);
-  const velocity_3sur2 = Math.sqrt(
-    (2 / data.gho) * Math.sqrt(data.k / (3 * data.CD0)) * WdivS
+  const rateOfClimbArray = getRateOfClimbArray(
+    powerRequiredArray,
+    powerAvailableArray,
+    maxTakeOffWeight
   );
 
-  // Stall Velocity
-  const CLmax = maxLiftCoefficient * Math.cos(sweepAngle * (data.PI / 180));
-  const stallVelocity = Math.sqrt(
-    (2 * maxTakeOffWeight) / (data.gho * wingArea * CLmax)
+  const Z = getZ(CLdivCD_max, TdivW);
+  const maxRateOfClimb = getMaxRateOfClimb(Z, CLdivCD_max, TdivW, WdivS);
+  const maxRateOfClimbVelocity = getMaxRateOfClimbVelocity(
+    CLdivCD_max,
+    TdivW,
+    WdivS
   );
 
-  // Maximum Rate Of Climb Array
-  let RateOfClimbArray = [];
-  for (let i = 0; i < powerRequiredArray.length; i++) {
-    RateOfClimbArray.push(
-      (powerAvailableArray[i] - powerRequiredArray[i]) / maxTakeOffWeight
-    );
-  }
-
-  // Maximum Rate Of Climb
-  const Z = 1 + Math.sqrt(1 + 3 / (CLdivCD_max ** 2 * TdivW ** 2));
-  const maxRateOfClimb =
-    Math.sqrt((WdivS * Z) / (3 * data.gho * data.CD0)) *
-    TdivW ** (3 / 2) *
-    (1 - Z / 6 - 3 / (2 * TdivW ** 2 * CLdivCD_max ** 2 * Z));
-  const maxRateOfClimbVelocity = Math.sqrt(
-    ((TdivW * WdivS) / (3 * data.gho * data.CD0)) *
-      (1 + Math.sqrt(1 + 3 / (CLdivCD_max ** 2 * TdivW ** 2)))
-  );
-
-  // Maximum Climb Angle
   const maxClimbAngleInRadian = Math.asin(1 / CLdivCD_max);
   const maxClimbAngleInDegrees = maxClimbAngleInRadian * (180 / data.PI);
-  const maxClimbAngleVelocity = Math.sqrt(
-    (2 / data.gho) *
-      Math.sqrt(data.k / data.CD0) *
-      WdivS *
-      Math.cos(maxClimbAngleInRadian)
+  const maxClimbAngleVelocity = getMaxClimbAngleVelocity(
+    WdivS,
+    maxClimbAngleInRadian
   );
   const maxClimbAngleRateOfClimb =
     maxClimbAngleVelocity * Math.sin(maxClimbAngleInRadian);
 
-  // ???
-  // const angle1 = ;
-  // const angle2 = ;
+  // The hodograph diagram for climb performance at sea level
+  // const angle1 = ???;
+  // const angle2 = ???;
 
-  // Minimum Sink Velocity
-  const minSinkVelocity = Math.sqrt(
-    (2 / (data.gho * CL_3sur2_divCD_max)) * WdivS
-  );
-
-  // Minimum Glide Angle
+  const minSinkVelocity = getMinSinkVelocity(CL_3sur2_divCD_max, WdivS);
   const minGlideAngleInRadian = Math.atan(1 / CLdivCD_max);
   const minGlideAngleInDegree = minGlideAngleInRadian * (180 / data.PI);
 
-  // Maximum Rate Of Climb At different altitudes
-  let RateOfClimbAtAltitudesArray = [];
-  for (let i = h_gho.length - 1; i >= 0; i--) {
-    const TdivW =
-      (thrustAvailable / maxTakeOffWeight) * (h_gho[i].gho / data.gho) ** m;
-    RateOfClimbAtAltitudesArray.push({
-      h: h_gho[i].h,
-      maxRateOfClimb:
-        Math.sqrt((WdivS * Z) / (3 * h_gho[i].gho * data.CD0)) *
-        TdivW ** (3 / 2) *
-        (1 - Z / 6 - 3 / (2 * TdivW ** 2 * CLdivCD_max ** 2 * Z)),
-    });
-  }
+  const rateOfClimbAtAltitudesArray = getRateOfClimbAtAltitudesArray(
+    thrustAvailable,
+    maxTakeOffWeight,
+    m,
+    WdivS,
+    CLdivCD_max,
+    Z
+  );
   const serviceCeiling = 0; // ???
   const absoluteCeiling = 0; // ???
 
-  // Time Of Climbing
-  const altitudeToClimb = 10000; // ft
-  const rateOfClimbAtSeaLevel = 163.098; // ???
-  const slope = -0.0035398; // ???
-  const timeOfClimbingInSeconds =
-    (Math.log(rateOfClimbAtSeaLevel + slope * altitudeToClimb) -
-      Math.log(rateOfClimbAtSeaLevel)) /
-    slope;
-  const timeOfClimbingInMinutes = timeOfClimbingInSeconds / 60;
+  const timeOfClimbing = getTimeOfClimbing();
 
-  // Maximum Range
-  const maxZeroFuelWeight = maxTakeOffWeight - maxUsableFuelWeight;
-  const maxRange =
-    ((2 * 3600) / thrustSpecificFuelConsumption) *
-    Math.sqrt((2 / data.gho) * wingArea) *
-    CL_1sur2_divCD_max *
-    (Math.sqrt(maxTakeOffWeight) - Math.sqrt(maxZeroFuelWeight));
+  const maxRange = getMaxRange(
+    maxTakeOffWeight,
+    maxUsableFuelWeight,
+    thrustSpecificFuelConsumption,
+    wingArea,
+    CL_1sur2_divCD_max
+  );
   const maxRangeVelocity = velocity_1sur2;
 
-  // Maximum Endurance
-  const maxEnduranceInSecondes =
-    (3600 / thrustSpecificFuelConsumption) *
-    CLdivCD_max *
-    Math.log(maxTakeOffWeight / maxZeroFuelWeight);
-  const maxEnduranceInHoures = maxEnduranceInSecondes / 3600;
+  const maxEndurance = getMaxEndurance(
+    maxTakeOffWeight,
+    maxUsableFuelWeight,
+    thrustSpecificFuelConsumption,
+    CLdivCD_max
+  );
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
@@ -245,7 +216,7 @@ export default function SteadyPerformance({
       <Separator className="my-4" />
       <p>Rate of Climb curve:</p>
       <div className="h-[250px] sm:h-[400px]">
-        <RateOfClimbGraphe RateOfClimbArray={RateOfClimbArray} />
+        <RateOfClimbGraphe RateOfClimbArray={rateOfClimbArray} />
       </div>
 
       <Separator className="my-4" />
@@ -300,7 +271,7 @@ export default function SteadyPerformance({
       <p>Maximum Rate Of Climb curve at different altitudes:</p>
       <div className="h-[250px] sm:h-[400px]">
         <RateOfClimbAtAltitudesGraphe
-          RateOfClimbAtAltitudesArray={RateOfClimbAtAltitudesArray}
+          RateOfClimbAtAltitudesArray={rateOfClimbAtAltitudesArray}
         />
       </div>
       <p>
@@ -314,16 +285,16 @@ export default function SteadyPerformance({
       <p>
         Time Of Climbing ={" "}
         <span className="font-medium">
-          {timeOfClimbingInSeconds.toFixed(2)} s
+          {timeOfClimbing.seconds.toFixed(2)} s
         </span>{" "}
         ={" "}
         <span className="font-medium">
-          {timeOfClimbingInMinutes.toFixed(2)} min
+          {timeOfClimbing.minutes.toFixed(2)} min
         </span>
       </p>
 
       <Separator className="my-4" />
-      <Alert variant="destructive">
+      <Alert variant="destructive" className="p-2">
         <AlertTitle>Warning:</AlertTitle>
         <AlertDescription>
           The true Maximum Range = (Rmax) * Number of engines
@@ -340,11 +311,11 @@ export default function SteadyPerformance({
       <p>
         Max Endurance ={" "}
         <span className="font-medium">
-          {maxEnduranceInSecondes.toFixed(2)} s
+          {maxEndurance.secondes.toFixed(2)} s
         </span>{" "}
         ={" "}
         <span className="font-medium">
-          {maxEnduranceInHoures.toFixed(2)} hours{" "}
+          {maxEndurance.houres.toFixed(2)} hours{" "}
         </span>{" "}
         and it&apos;s velocity ={" "}
         <span className="font-medium">{velocity_1.toFixed(2)} ft/s</span>
