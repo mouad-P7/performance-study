@@ -13,7 +13,6 @@ import SteadyPerformance from "./SteadyPerformance";
 import NonSteadyPerformance from "./NonSteadyPerformance";
 import { Separator } from "@/components/ui/separator";
 import { aircraftFormFields } from "@/lib/constants";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Form,
@@ -76,12 +75,6 @@ export default function AircraftForm() {
 
   return (
     <>
-      <Alert className="p-3 mb-2">
-        <AlertTitle>Important:</AlertTitle>
-        <AlertDescription>
-          Respect the unit described in each input.
-        </AlertDescription>
-      </Alert>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

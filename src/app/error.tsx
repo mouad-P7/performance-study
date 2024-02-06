@@ -17,7 +17,7 @@ export default function Error({
 
   return (
     <div className="flex-1 flex justify-center items-center flex-col gap-8">
-      <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+      <h1 className="text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
         Something went wrong!
       </h1>
       <div className="flex justify-center items-center gap-4">
