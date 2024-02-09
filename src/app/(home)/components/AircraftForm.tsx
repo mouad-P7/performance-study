@@ -31,8 +31,13 @@ export default function AircraftForm() {
   const { toast } = useToast();
 
   // 1. Define your form.
+  const defaultFieldValues = aircraftFormFields.reduce((acc: any, field) => {
+    acc[field.name] = "";
+    return acc;
+  }, {});
   const form = useForm<z.infer<typeof aircraftFormSchema>>({
     resolver: zodResolver(aircraftFormSchema),
+    defaultValues: defaultFieldValues,
   });
 
   // 2. Define a submit handler.
@@ -55,24 +60,6 @@ export default function AircraftForm() {
     }
   }
 
-  function resetForm() {
-    form.reset();
-    form.setValue("wingSpan", "");
-    form.setValue("wingArea", "");
-    form.setValue("spanEfficiencyFactor", "");
-    form.setValue("liftCoefficient1", "");
-    form.setValue("liftCoefficient2", "");
-    form.setValue("alpha1", "");
-    form.setValue("alpha2", "");
-    form.setValue("alpha0", "");
-    form.setValue("thrustAvailable", "");
-    form.setValue("m", "");
-    form.setValue("maxTakeOffWeight", "");
-    form.setValue("maxLiftCoefficient", "");
-    form.setValue("sweepAngle", "");
-    setInputs(undefined);
-  }
-
   return (
     <>
       <Form {...form}>
@@ -86,8 +73,11 @@ export default function AircraftForm() {
               type="button"
               size="sm"
               variant="destructive"
-              onClick={resetForm}
               disabled={isSubmitting}
+              onClick={() => {
+                form.reset(defaultFieldValues);
+                setInputs(undefined);
+              }}
             >
               <FilterX size={20} />
               <p className="ml-2">Reset Form</p>
