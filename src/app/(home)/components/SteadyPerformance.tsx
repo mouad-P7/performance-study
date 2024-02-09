@@ -1,7 +1,6 @@
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { aircraftFormSchema } from "@/schema/aircraft.schema";
-import { data, h_gho } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import TR_TA_Graphe from "./TR_TA_Graphe";
 import PR_PA_Graphe from "./PR_PA_Graphe";
@@ -53,34 +52,37 @@ export default function SteadyPerformance({
     sweepAngle,
     thrustSpecificFuelConsumption,
     maxUsableFuelWeight,
-  }: any = inputs;
+  } = inputs;
 
-  const aspectRatio = wingSpan ** 2 / wingArea;
+  const aspectRatio = Number(wingSpan) ** 2 / Number(wingArea);
 
   const liftCoefficient = getLiftCoefficient(
-    liftCoefficient1,
-    liftCoefficient2,
-    alpha1,
-    alpha2,
-    alpha0,
-    aspectRatio,
-    spanEfficiencyFactor
+    Number(liftCoefficient1),
+    Number(liftCoefficient2),
+    Number(alpha1),
+    Number(alpha2),
+    Number(alpha0),
+    Number(aspectRatio),
+    Number(spanEfficiencyFactor)
   );
 
   const thrustRequiredArray = getThrustRequiredArray(
-    wingArea,
-    maxTakeOffWeight
+    Number(wingArea),
+    Number(maxTakeOffWeight)
   );
 
-  const thrustAvailableAt1000ft = get_TA_At1000ft(thrustAvailable, m);
+  const thrustAvailableAt1000ft = get_TA_At1000ft(
+    Number(thrustAvailable),
+    Number(m)
+  );
 
   const { powerRequiredArray, powerAvailableArray } = get_PR_PA_Arrays(
-    thrustAvailable,
+    Number(thrustAvailable),
     thrustRequiredArray
   );
 
-  const TdivW = thrustAvailable / maxTakeOffWeight;
-  const WdivS = maxTakeOffWeight / wingArea;
+  const TdivW = Number(thrustAvailable) / Number(maxTakeOffWeight);
+  const WdivS = Number(maxTakeOffWeight) / Number(wingArea);
   const maxVelocity = getMaxVelocity(TdivW, WdivS);
 
   const { CLdivCD_max, CL_1sur2_divCD_max, CL_3sur2_divCD_max } =
@@ -89,16 +91,16 @@ export default function SteadyPerformance({
     get_CLdivCD_Velocities(WdivS);
 
   const stallVelocity = getStallVelocity(
-    maxLiftCoefficient,
-    sweepAngle,
-    maxTakeOffWeight,
-    wingArea
+    Number(maxLiftCoefficient),
+    Number(sweepAngle),
+    Number(maxTakeOffWeight),
+    Number(wingArea)
   );
 
   const rateOfClimbArray = getRateOfClimbArray(
     powerRequiredArray,
     powerAvailableArray,
-    maxTakeOffWeight
+    Number(maxTakeOffWeight)
   );
 
   const Z = getZ(CLdivCD_max, TdivW);
@@ -110,7 +112,7 @@ export default function SteadyPerformance({
   );
 
   const maxClimbAngleInRadian = Math.asin(1 / CLdivCD_max);
-  const maxClimbAngleInDegrees = maxClimbAngleInRadian * (180 / data.PI);
+  const maxClimbAngleInDegrees = maxClimbAngleInRadian * (180 / Math.PI);
   const maxClimbAngleVelocity = getMaxClimbAngleVelocity(
     WdivS,
     maxClimbAngleInRadian
@@ -124,12 +126,12 @@ export default function SteadyPerformance({
 
   const minSinkVelocity = getMinSinkVelocity(CL_3sur2_divCD_max, WdivS);
   const minGlideAngleInRadian = Math.atan(1 / CLdivCD_max);
-  const minGlideAngleInDegree = minGlideAngleInRadian * (180 / data.PI);
+  const minGlideAngleInDegree = minGlideAngleInRadian * (180 / Math.PI);
 
   const rateOfClimbAtAltitudesArray = getRateOfClimbAtAltitudesArray(
-    thrustAvailable,
-    maxTakeOffWeight,
-    m,
+    Number(thrustAvailable),
+    Number(maxTakeOffWeight),
+    Number(m),
     WdivS,
     CLdivCD_max,
     Z
@@ -140,18 +142,18 @@ export default function SteadyPerformance({
   const timeOfClimbing = getTimeOfClimbing();
 
   const maxRange = getMaxRange(
-    maxTakeOffWeight,
-    maxUsableFuelWeight,
-    thrustSpecificFuelConsumption,
-    wingArea,
+    Number(maxTakeOffWeight),
+    Number(maxUsableFuelWeight),
+    Number(thrustSpecificFuelConsumption),
+    Number(wingArea),
     CL_1sur2_divCD_max
   );
   const maxRangeVelocity = velocity_1sur2;
 
   const maxEndurance = getMaxEndurance(
-    maxTakeOffWeight,
-    maxUsableFuelWeight,
-    thrustSpecificFuelConsumption,
+    Number(maxTakeOffWeight),
+    Number(maxUsableFuelWeight),
+    Number(thrustSpecificFuelConsumption),
     CLdivCD_max
   );
 
@@ -171,7 +173,7 @@ export default function SteadyPerformance({
       <div className="h-[250px] sm:h-[400px]">
         <TR_TA_Graphe
           thrustRequiredArray={thrustRequiredArray}
-          thrustAvailable={thrustAvailable}
+          thrustAvailable={Number(thrustAvailable)}
           thrustAvailableAt1000ft={thrustAvailableAt1000ft}
         />
       </div>
@@ -255,7 +257,7 @@ export default function SteadyPerformance({
       <div className="h-[250px] sm:h-[400px]">
         <SinkVelocityGraphe
           powerRequiredArray={powerRequiredArray}
-          maxTakeOffWeight={maxTakeOffWeight}
+          maxTakeOffWeight={Number(maxTakeOffWeight)}
         />
       </div>
       <p>
